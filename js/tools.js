@@ -278,6 +278,19 @@ export class ToolsManager {
     }
   }
 
+  cancelDrawingStroke() {
+    this.isDrawing = false;
+    this.isPinching = true;
+    this.engine.overlayCtx.clearRect(0, 0, this.engine.width, this.engine.height);
+
+    if (this.strokeSnapshot) {
+      this.engine.drawCtx.clearRect(0, 0, this.engine.width, this.engine.height);
+      this.engine.drawCtx.drawImage(this.strokeSnapshot, 0, 0);
+      this.engine.render();
+      this.strokeSnapshot = null;
+    }
+  }
+
   /**
    * Main Canvas Interaction Wiring (Mouse, Touch Screen iPad, Apple Pencil)
    */
@@ -287,9 +300,9 @@ export class ToolsManager {
     const handleStart = (e) => {
       if (!this.engine.hasImage) return;
 
-      // If 2 or more touches (Pinch Gesture on iPad), cancel drawing
-      if (e.touches && e.touches.length >= 2) {
-        this.isDrawing = false;
+      // If 2 or more touches (Pinch Gesture on iPad), cancel drawing & restore layer
+      if ((e.touches && e.touches.length >= 2) || this.isPinching) {
+        this.cancelDrawingStroke();
         return;
       }
 
@@ -298,6 +311,12 @@ export class ToolsManager {
       if (e.cancelable && (e.type.startsWith('touch') || e.type.startsWith('pointer'))) {
         e.preventDefault();
       }
+
+      // Save pre-stroke snapshot to allow 100% clean rollback if a 2nd finger touches down
+      this.strokeSnapshot = document.createElement('canvas');
+      this.strokeSnapshot.width = this.engine.width;
+      this.strokeSnapshot.height = this.engine.height;
+      this.strokeSnapshot.getContext('2d').drawImage(this.engine.drawCanvas, 0, 0);
 
       const coords = this.engine.getCanvasCoords(e);
       this.isDrawing = true;
@@ -316,11 +335,13 @@ export class ToolsManager {
     };
 
     const handleMove = (e) => {
-      // If 2 or more touches, cancel single finger drawing
+      // If 2 or more touches (Pinch Gesture on iPad), cancel single finger drawing
       if (e.touches && e.touches.length >= 2) {
-        this.isDrawing = false;
+        this.cancelDrawingStroke();
         return;
       }
+
+      if (this.isPinching) return;
 
       const coords = this.engine.getCanvasCoords(e);
 
@@ -344,10 +365,15 @@ export class ToolsManager {
       this.lastY = coords.y;
     };
 
-
     const handleEnd = (e) => {
+      // If all fingers are lifted off screen, reset pinch lock
+      if (!e.touches || e.touches.length === 0) {
+        this.isPinching = false;
+      }
+
       if (!this.isDrawing) return;
       this.isDrawing = false;
+      this.strokeSnapshot = null;
 
       const coords = this.engine.getCanvasCoords(e);
 
@@ -373,6 +399,7 @@ export class ToolsManager {
         }
       }
     };
+
 
     // Pointer Events (iPad Touch & Apple Pencil)
     canvas.addEventListener('pointerdown', handleStart, { passive: false });
