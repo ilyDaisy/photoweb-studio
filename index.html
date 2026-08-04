@@ -196,7 +196,15 @@
     </section>
 
     <!-- Right Control Panels (Photoshop-style collapsible accordion) -->
-    <aside class="right-sidebar ps-panels">
+    <aside class="right-sidebar ps-panels" id="right-sidebar">
+
+      <!-- Slide Toggle Tab (on the left edge) -->
+      <button class="sidebar-slide-tab" id="btn-sidebar-slide" title="เปิด/ปิดแถบพาเนล">
+        <i class="fa-solid fa-chevron-right" id="sidebar-slide-icon"></i>
+      </button>
+
+      <!-- All panel content wrapped for hide/show -->
+      <div class="ps-panels-content">
 
       <!-- PANEL: Brightness & Contrast -->
       <div class="ps-panel" id="panel-brightness">
@@ -377,6 +385,8 @@
           </button>
         </div>
       </div>
+
+      </div><!-- end ps-panels-content -->
 
     </aside>
 

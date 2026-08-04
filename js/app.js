@@ -216,14 +216,24 @@ document.addEventListener('DOMContentLoaded', () => {
      Right Sidebar - Photoshop-style Accordion Panels
      ========================================================================== */
 
-  // Sidebar global toggle (hide/show whole sidebar)
-  const toggleSidebarBtn = document.getElementById('btn-toggle-sidebar');
-  const rightSidebar = document.querySelector('.right-sidebar');
+  const rightSidebar = document.getElementById('right-sidebar');
+  const sidebarSlideBtn = document.getElementById('btn-sidebar-slide');
 
+  // Slide sidebar in/out when clicking the tab on its left edge
+  if (sidebarSlideBtn && rightSidebar) {
+    sidebarSlideBtn.addEventListener('click', () => {
+      rightSidebar.classList.toggle('slide-closed');
+      // Re-fit canvas after sidebar animation ends
+      setTimeout(() => canvasEngine.zoomToFit(), 280);
+    });
+  }
+
+  // Legacy header toggle button (if present)
+  const toggleSidebarBtn = document.getElementById('btn-toggle-sidebar');
   if (toggleSidebarBtn && rightSidebar) {
     toggleSidebarBtn.addEventListener('click', () => {
-      rightSidebar.classList.toggle('collapsed');
-      setTimeout(() => canvasEngine.zoomToFit(), 200);
+      rightSidebar.classList.toggle('slide-closed');
+      setTimeout(() => canvasEngine.zoomToFit(), 280);
     });
   }
 

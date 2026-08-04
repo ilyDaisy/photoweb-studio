@@ -610,12 +610,83 @@ body.dark-theme {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
+  /* Slide transition */
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              min-width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
 }
+
+/* Collapsed state — width collapses to just the tab button */
+.right-sidebar.slide-closed {
+  width: 18px !important;
+  min-width: 18px !important;
+  overflow: visible; /* let the tab button stick out */
+}
+
+/* Hide all panel content when collapsed */
+.right-sidebar.slide-closed .ps-panels-content {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* The sticky tab button on the left edge */
+.sidebar-slide-tab {
+  position: absolute;
+  left: -22px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 56px;
+  background: #2c2c2c;
+  border: 1px solid #444;
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+  font-size: 0.65rem;
+  z-index: 10;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-slide-tab:hover {
+  background: #3a3a3a;
+  color: var(--accent-cyan);
+}
+
+/* Flip the chevron when open */
+.right-sidebar:not(.slide-closed) .sidebar-slide-tab i {
+  transform: rotate(0deg);
+  transition: transform 0.25s ease;
+}
+.right-sidebar.slide-closed .sidebar-slide-tab i {
+  transform: rotate(180deg);
+  transition: transform 0.25s ease;
+}
+
+
 
 /* Photoshop-style accordion panels */
 .ps-panels {
   overflow-y: auto;
   flex: 1;
+}
+
+.ps-panels-content {
+  min-width: var(--sidebar-width);
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  opacity: 1;
+  visibility: visible;
+}
+
+.right-sidebar.slide-closed .ps-panels-content {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .ps-panels::-webkit-scrollbar {
