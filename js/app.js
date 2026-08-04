@@ -219,14 +219,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const rightSidebar = document.getElementById('right-sidebar');
   const toggleSidebarBtn = document.getElementById('btn-toggle-sidebar'); // sliders icon in header
 
+  // Fire zoomToFit EXACTLY when the sidebar slide animation finishes
+  if (rightSidebar) {
+    rightSidebar.addEventListener('transitionend', (e) => {
+      // Only react to the width transition (not other props)
+      if (e.propertyName === 'width') {
+        canvasEngine.zoomToFit();
+      }
+    });
+  }
+
   // Header sliders button toggles the entire right sidebar open/closed
   if (toggleSidebarBtn && rightSidebar) {
     toggleSidebarBtn.addEventListener('click', () => {
       const closing = !rightSidebar.classList.contains('slide-closed');
       rightSidebar.classList.toggle('slide-closed');
       document.body.classList.toggle('sidebar-closed', closing);
-      // Re-fit canvas after transition
-      setTimeout(() => canvasEngine.zoomToFit(), 300);
     });
   }
 
