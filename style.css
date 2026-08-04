@@ -47,24 +47,26 @@
 }
 
 /* Reset & Base Setup */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  user-select: none;
+html, body {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  touch-action: none;
+  overscroll-behavior: none;
   -webkit-user-select: none;
+  user-select: none;
 }
 
 body.dark-theme {
   font-family: var(--font-family);
   background-color: var(--bg-darkest);
   color: var(--text-main);
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
+
 
 /* Utility Typography */
 .text-xs { font-size: 0.75rem; }

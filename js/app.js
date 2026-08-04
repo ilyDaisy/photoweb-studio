@@ -18,7 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
      Clipboard Operations & Keyboard Shortcuts
      ========================================================================== */
 
+  // Prevent Safari default gesture zoom/swipe on iPad
+  document.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
+  document.addEventListener('gesturechange', (e) => e.preventDefault(), { passive: false });
+  document.addEventListener('gestureend', (e) => e.preventDefault(), { passive: false });
+
   // Global Paste Event (Ctrl+V anywhere on window)
+
   window.addEventListener('paste', (e) => {
     handlePasteEvent(e, (img) => {
       canvasEngine.loadImage(img);
