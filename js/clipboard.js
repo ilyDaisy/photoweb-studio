@@ -4,8 +4,6 @@
 
 /**
  * Display a modern Toast notification on screen
- * @param {string} message - Message text
- * @param {'success'|'error'|'info'} type - Type of toast
  */
 export function showToast(message, type = 'success') {
   const container = document.getElementById('toast-container');
@@ -35,8 +33,7 @@ export function showToast(message, type = 'success') {
 
 /**
  * Copy HTML5 Canvas content directly to system Clipboard as PNG
- * Supports Safari/iPadOS Promise<Blob> synchronous user-activation model
- * @param {HTMLCanvasElement} canvas 
+ * Supports iPadOS / iOS Web Share API and Copy Sheet fallback
  */
 export async function copyCanvasToClipboard(canvas) {
   if (!canvas) {
@@ -44,75 +41,73 @@ export async function copyCanvasToClipboard(canvas) {
     return false;
   }
 
-  try {
-    if (navigator.clipboard && window.ClipboardItem) {
-      // 1. iOS Safari Compliant: Pass Promise<Blob> synchronously inside ClipboardItem to preserve user click activation
-      const blobPromise = new Promise((resolve, reject) => {
-        canvas.toBlob((blob) => {
-          if (blob) resolve(blob);
-          else reject(new Error('Canvas toBlob failed'));
-        }, 'image/png');
-      });
-
-      const item = new ClipboardItem({ 'image/png': blobPromise });
-      await navigator.clipboard.write([item]);
-      showToast('📋 ก็อปปี้รูปภาพลง Clipboard สำเร็จ! (พร้อมนำไปกดวางได้เลย)', 'success');
-      return true;
-    } else {
-      showToast('เบราว์เซอร์นี้ไม่รองรับ ClipboardItem API', 'error');
-      showIOSCopyFallbackModal(canvas);
-      return false;
-    }
-  } catch (err) {
-    console.warn('Primary Clipboard write failed, attempting fallback...', err);
-
-    // Fallback 2: Try resolved blob write
-    try {
-      const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
-      if (blob && navigator.clipboard && navigator.clipboard.write) {
-        const item = new ClipboardItem({ 'image/png': blob });
-        await navigator.clipboard.write([item]);
-        showToast('📋 ก็อปปี้รูปภาพลง Clipboard สำเร็จ!', 'success');
-        return true;
-      }
-    } catch (fallbackErr) {
-      console.error('All clipboard write attempts failed:', fallbackErr);
-    }
-
-    // Fallback 3 for iOS Safari: Show easy Copy preview modal for touch & hold
-    showIOSCopyFallbackModal(canvas);
+  // Convert Canvas to Blob
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+  if (!blob) {
+    showToast('เกิดข้อผิดพลาดในการประมวลผลรูปภาพ', 'error');
     return false;
   }
+
+  // Method 1: Try direct Async Clipboard API (Works on Desktop Chrome / Edge / Safari Desktop)
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new ClipboardItem({ 'image/png': blob });
+      await navigator.clipboard.write([item]);
+      showToast('📋 ก็อปปี้รูปภาพลง Clipboard สำเร็จ! (พร้อมกดวางได้ทันที)', 'success');
+      return true;
+    }
+  } catch (err) {
+    console.warn('Direct clipboard write blocked by browser security policy:', err);
+  }
+
+  // Method 2: Web Share API (Works natively on iPadOS / iOS Safari -> Opens native iOS sheet with "Copy")
+  try {
+    const file = new File([blob], 'photoweb-edited.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      showToast('📲 กำลังเปิดเมนูคัดลอกรูปภาพ (โปรดเลือก "Copy" หรือ "คัดลอก")', 'info');
+      await navigator.share({
+        files: [file],
+        title: 'PhotoWeb Studio Image'
+      });
+      return true;
+    }
+  } catch (shareErr) {
+    console.warn('Web share cancelled or failed:', shareErr);
+  }
+
+  // Method 3: Clean iOS Copy Sheet Modal (Allows Tap & Hold Long Press "Copy Image" or Download)
+  showIOSCopyFallbackModal(canvas, blob);
+  return false;
 }
 
 /**
- * Fallback Modal for iOS Safari when direct Clipboard write is blocked by iOS policy
- * Allows 1-tap Long Press "Copy Image" or Download
+ * Clean Copy Modal for iOS Safari / iPadOS when direct API is restricted
  */
-function showIOSCopyFallbackModal(canvas) {
+function showIOSCopyFallbackModal(canvas, blob) {
   let modal = document.getElementById('ios-copy-modal');
   if (!modal) {
     modal = document.createElement('div');
     modal.id = 'ios-copy-modal';
     modal.className = 'modal-backdrop';
+    modal.style.zIndex = '10000';
     document.body.appendChild(modal);
   }
 
   const dataUrl = canvas.toDataURL('image/png');
 
   modal.innerHTML = `
-    <div class="modal-card" style="max-width: 440px;">
+    <div class="modal-card" style="max-width: 440px; box-shadow: 0 0 30px rgba(0,229,255,0.4);">
       <div class="modal-header">
-        <h3><i class="fa-regular fa-copy"></i> คัดลอกรูปภาพ (iPad / iOS)</h3>
+        <h3><i class="fa-regular fa-copy" style="color:var(--accent-cyan)"></i> คัดลอกรูปภาพลง Clipboard</h3>
         <button class="btn-close" onclick="document.getElementById('ios-copy-modal').classList.add('hidden')">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
       <div class="modal-body" style="align-items: center; text-align: center;">
         <p class="text-sm" style="color: var(--accent-cyan); font-weight: 500;">
-          💡 แตะที่รูปภาพด้านล่างค้างไว้ (Long Press) แล้วเลือก <b>"คัดลอกรูปภาพ" (Copy Image)</b>
+          💡 แตะที่รูปภาพด้านล่างค้างไว้ (Long Press) แล้วเลือก <b>"คัดลอกรูปภาพ" (Copy Image)</b> เพื่อวางต่อได้ทันที
         </p>
-        <div style="max-height: 260px; overflow: auto; border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px; background: #111;">
+        <div style="max-height: 260px; overflow: auto; border: 1px dashed var(--accent-cyan); border-radius: 8px; padding: 6px; background: #111;">
           <img src="${dataUrl}" style="max-width: 100%; height: auto; border-radius: 4px; display: block;" alt="Copied Canvas Image">
         </div>
       </div>
@@ -126,16 +121,16 @@ function showIOSCopyFallbackModal(canvas) {
   `;
 
   modal.classList.remove('hidden');
+  showToast('💡 แตะรูปค้างไว้เพื่อคัดลอก (Copy Image) ได้ทันที', 'info');
 }
 
 /**
  * Paste image from system Clipboard via async Clipboard API
- * @param {Function} onImageLoaded - Callback receiving HTMLImageElement
  */
 export async function pasteFromClipboardAsync(onImageLoaded) {
   try {
     if (!navigator.clipboard || !navigator.clipboard.read) {
-      showToast('โปรดใช้คีย์ลัด Ctrl+V เพื่อวางรูปภาพในเบราว์เซอร์นี้', 'info');
+      showToast('โปรดกดคีย์ลัด Ctrl+V หรือแตะวางรูปภาพ', 'info');
       return false;
     }
 
@@ -172,8 +167,6 @@ export async function pasteFromClipboardAsync(onImageLoaded) {
 
 /**
  * Handle Paste Event (Ctrl+V) from global window event listener
- * @param {ClipboardEvent} e 
- * @param {Function} onImageLoaded 
  */
 export function handlePasteEvent(e, onImageLoaded) {
   const items = (e.clipboardData || e.originalEvent?.clipboardData)?.items;
