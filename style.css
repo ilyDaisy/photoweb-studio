@@ -1072,3 +1072,81 @@ select:focus, input:focus {
   justify-content: flex-end;
   gap: 10px;
 }
+
+/* ==========================================================================
+   Responsive UI Optimization & Collapsible Sidebar Panel
+   ========================================================================== */
+
+.right-sidebar {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s ease, opacity 0.2s ease;
+  z-index: 20;
+}
+
+.right-sidebar.collapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-left: none;
+}
+
+.tool-options-bar {
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.tool-options-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.left-toolbar {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Tablet & iPad Responsive Rules (<= 992px) */
+@media (max-width: 992px) {
+  .right-sidebar {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    box-shadow: -8px 0 25px rgba(0,0,0,0.6);
+  }
+
+  .right-sidebar.collapsed {
+    transform: translateX(100%);
+  }
+
+  .btn-text {
+    display: none;
+  }
+
+  .header-center-actions {
+    padding: 2px 6px;
+    gap: 4px;
+  }
+}
+
+/* Small Mobile Screens (<= 600px) */
+@media (max-width: 600px) {
+  .app-header {
+    padding: 0 8px;
+  }
+
+  .app-title {
+    font-size: 0.9rem;
+  }
+
+  .app-badge {
+    display: none;
+  }
+
+  .canvas-status-bar .status-item.highlight {
+    display: none;
+  }
+}
+

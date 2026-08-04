@@ -210,7 +210,17 @@ document.addEventListener('DOMContentLoaded', () => {
      Right Sidebar Panel Tabs & Sliders
      ========================================================================== */
 
-  // Sidebar Tab Switching
+  // Sidebar Tab Switching & Collapse Toggle
+  const toggleSidebarBtn = document.getElementById('btn-toggle-sidebar');
+  const rightSidebar = document.querySelector('.right-sidebar');
+
+  if (toggleSidebarBtn && rightSidebar) {
+    toggleSidebarBtn.addEventListener('click', () => {
+      rightSidebar.classList.toggle('collapsed');
+      setTimeout(() => canvasEngine.zoomToFit(), 200);
+    });
+  }
+
   document.querySelectorAll('.sidebar-tabs .tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const tabTarget = btn.dataset.tab;
@@ -219,8 +229,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       btn.classList.add('active');
       document.getElementById(`tab-${tabTarget}`)?.classList.add('active');
+
+      // Expand sidebar if collapsed when tapping tabs
+      if (rightSidebar && rightSidebar.classList.contains('collapsed')) {
+        rightSidebar.classList.remove('collapsed');
+      }
     });
   });
+
 
   // Adjustments Sliders Event Wireup
   const sliderIds = ['brightness', 'contrast', 'saturation', 'hue', 'blur', 'sharpen'];
