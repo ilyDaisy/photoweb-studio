@@ -10,13 +10,14 @@ export class ToolsManager {
     this.engine = engine;
     this.activeTool = 'select';
 
-    // Tool Options
-    this.brushType = 'ink'; // 'round', 'ink' (ตามเรฟ), 'calligraphy', 'soft'
-    this.brushSize = 24;
-    this.brushOpacity = 0.95;
-    this.primaryColor = '#121212';
+    // Tool Options (Default: Pink color, 15% Opacity as requested)
+    this.brushType = 'soft'; // 'round', 'ink', 'calligraphy', 'soft'
+    this.brushSize = 40;
+    this.brushOpacity = 0.15; // 15% opacity
+    this.primaryColor = '#ff3b70'; // Pink (สีชมพู)
     this.secondaryColor = '#ffffff';
     this.fillShape = false;
+
     
     // Text options
     this.fontSize = 28;
