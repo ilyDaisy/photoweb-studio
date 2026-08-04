@@ -213,10 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ==========================================================================
-     Right Sidebar Panel Tabs & Sliders
+     Right Sidebar - Photoshop-style Accordion Panels
      ========================================================================== */
 
-  // Sidebar Tab Switching & Collapse Toggle
+  // Sidebar global toggle (hide/show whole sidebar)
   const toggleSidebarBtn = document.getElementById('btn-toggle-sidebar');
   const rightSidebar = document.querySelector('.right-sidebar');
 
@@ -227,21 +227,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  document.querySelectorAll('.sidebar-tabs .tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const tabTarget = btn.dataset.tab;
-      document.querySelectorAll('.sidebar-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.right-sidebar .tab-content').forEach(c => c.classList.remove('active'));
-
-      btn.classList.add('active');
-      document.getElementById(`tab-${tabTarget}`)?.classList.add('active');
-
-      // Expand sidebar if collapsed when tapping tabs
-      if (rightSidebar && rightSidebar.classList.contains('collapsed')) {
-        rightSidebar.classList.remove('collapsed');
-      }
+  // Accordion panel toggle — click header to open/close
+  document.querySelectorAll('.ps-panel-header').forEach(header => {
+    header.addEventListener('click', (e) => {
+      // Don't collapse when clicking Reset button inside header
+      if (e.target.closest('.btn-text-reset')) return;
+      const panel = header.closest('.ps-panel');
+      if (panel) panel.classList.toggle('open');
     });
   });
+
+  // Open first two panels by default (like Photoshop default state)
+  const allPanels = document.querySelectorAll('.ps-panel');
+  if (allPanels[0]) allPanels[0].classList.add('open');
+  if (allPanels[1]) allPanels[1].classList.add('open');
+
+
 
 
   // Adjustments Sliders Event Wireup

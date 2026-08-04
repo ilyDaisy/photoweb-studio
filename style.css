@@ -609,60 +609,102 @@ body.dark-theme {
   border-left: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
-.sidebar-tabs {
-  display: flex;
-  background-color: var(--bg-toolbar);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.tab-btn {
+/* Photoshop-style accordion panels */
+.ps-panels {
+  overflow-y: auto;
   flex: 1;
-  padding: 12px 6px;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  font-weight: 500;
-  cursor: pointer;
+}
+
+.ps-panels::-webkit-scrollbar {
+  width: 4px;
+}
+.ps-panels::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
+}
+
+.ps-panel {
+  border-bottom: 1px solid #111;
+}
+
+.ps-panel-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: all 0.15s ease;
+  gap: 7px;
+  padding: 7px 10px;
+  background: #2c2c2c;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease;
+  min-height: 30px;
 }
 
-.tab-btn:hover {
-  color: var(--text-main);
-  background-color: var(--bg-hover);
+.ps-panel-header:hover {
+  background: #363636;
 }
 
-.tab-btn.active {
-  color: var(--accent-cyan);
-  border-bottom-color: var(--accent-cyan);
-  background-color: var(--bg-panel);
+.ps-panel-arrow {
+  font-size: 0.6rem;
+  color: #aaa;
+  transition: transform 0.2s ease;
+  display: inline-block;
+  line-height: 1;
+  flex-shrink: 0;
+  /* default = collapsed, pointing right ▶ */
 }
 
-.tab-content {
+.ps-panel.open > .ps-panel-header .ps-panel-arrow {
+  transform: rotate(90deg); /* expanded = pointing down ▶ rotated 90° */
+}
+
+.ps-panel-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #ccc;
+  letter-spacing: 0.02em;
   flex: 1;
-  overflow-y: auto;
-  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ps-panel-title i {
+  color: var(--accent-cyan);
+  font-size: 0.72rem;
+}
+
+.ps-panel-body {
   display: none;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
+  padding: 12px 12px 14px;
+  background: var(--bg-panel);
+  animation: ps-panel-open 0.18s ease;
 }
 
-.tab-content.active {
+.ps-panel.open > .ps-panel-body {
   display: flex;
 }
+
+@keyframes ps-panel-open {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* old tab styles retained for nothing but compat */
+.sidebar-tabs { display: none; }
+.tab-content  { display: none !important; }
 
 .panel-section {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
+
+
 
 .section-title {
   display: flex;

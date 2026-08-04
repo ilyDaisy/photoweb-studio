@@ -195,30 +195,17 @@
       </div>
     </section>
 
-    <!-- Right Control Panels -->
-    <aside class="right-sidebar">
-      
-      <!-- Panel Tabs Header -->
-      <div class="sidebar-tabs">
-        <button class="tab-btn active" data-tab="adjustments">
-          <i class="fa-solid fa-sliders"></i> ปรับแต่ง
-        </button>
-        <button class="tab-btn" data-tab="filters">
-          <i class="fa-solid fa-wand-magic-sparkles"></i> ฟิลเตอร์
-        </button>
-        <button class="tab-btn" data-tab="transform">
-          <i class="fa-solid fa-vector-square"></i> มิติภาพ
-        </button>
-      </div>
+    <!-- Right Control Panels (Photoshop-style collapsible accordion) -->
+    <aside class="right-sidebar ps-panels">
 
-      <!-- Tab 1: Adjustments (Sliders) -->
-      <div class="tab-content active" id="tab-adjustments">
-        <div class="panel-section">
-          <div class="section-title">
-            <span><i class="fa-solid fa-sun"></i> ความสว่าง & คอนทราสต์</span>
-            <button class="btn-text-reset" id="btn-reset-adj">รีเซ็ต</button>
-          </div>
-
+      <!-- PANEL: Brightness & Contrast -->
+      <div class="ps-panel" id="panel-brightness">
+        <div class="ps-panel-header" data-panel="panel-brightness">
+          <span class="ps-panel-arrow">&#9658;</span>
+          <span class="ps-panel-title"><i class="fa-solid fa-sun"></i> Brightness / Contrast</span>
+          <button class="btn-text-reset" id="btn-reset-adj" title="Reset">Reset</button>
+        </div>
+        <div class="ps-panel-body">
           <div class="control-slider-group">
             <div class="slider-header">
               <label for="slider-brightness">Brightness (ความสว่าง)</label>
@@ -226,7 +213,6 @@
             </div>
             <input type="range" id="slider-brightness" min="-100" max="100" value="0">
           </div>
-
           <div class="control-slider-group">
             <div class="slider-header">
               <label for="slider-contrast">Contrast (ความคมชัด)</label>
@@ -235,12 +221,15 @@
             <input type="range" id="slider-contrast" min="-100" max="100" value="0">
           </div>
         </div>
+      </div>
 
-        <div class="panel-section">
-          <div class="section-title">
-            <span><i class="fa-solid fa-palette"></i> สี & โทนภาพ (Color Tone)</span>
-          </div>
-
+      <!-- PANEL: Hue / Saturation -->
+      <div class="ps-panel" id="panel-color">
+        <div class="ps-panel-header" data-panel="panel-color">
+          <span class="ps-panel-arrow">&#9658;</span>
+          <span class="ps-panel-title"><i class="fa-solid fa-palette"></i> Hue / Saturation</span>
+        </div>
+        <div class="ps-panel-body">
           <div class="control-slider-group">
             <div class="slider-header">
               <label for="slider-saturation">Saturation (ความสดสี)</label>
@@ -248,7 +237,6 @@
             </div>
             <input type="range" id="slider-saturation" min="-100" max="100" value="0">
           </div>
-
           <div class="control-slider-group">
             <div class="slider-header">
               <label for="slider-hue">Hue Shift (ปรับเฉดสี)</label>
@@ -257,12 +245,15 @@
             <input type="range" id="slider-hue" min="-180" max="180" value="0">
           </div>
         </div>
+      </div>
 
-        <div class="panel-section">
-          <div class="section-title">
-            <span><i class="fa-solid fa-eye-dropper"></i> เอฟเฟกต์พิเศษ</span>
-          </div>
-
+      <!-- PANEL: Blur / Sharpen -->
+      <div class="ps-panel" id="panel-effects">
+        <div class="ps-panel-header" data-panel="panel-effects">
+          <span class="ps-panel-arrow">&#9658;</span>
+          <span class="ps-panel-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Blur / Sharpen</span>
+        </div>
+        <div class="ps-panel-body">
           <div class="control-slider-group">
             <div class="slider-header">
               <label for="slider-blur">Blur (ความเบลอ)</label>
@@ -270,7 +261,6 @@
             </div>
             <input type="range" id="slider-blur" min="0" max="20" value="0" step="0.5">
           </div>
-
           <div class="control-slider-group">
             <div class="slider-header">
               <label for="slider-sharpen">Sharpen (ความคม)</label>
@@ -281,13 +271,13 @@
         </div>
       </div>
 
-      <!-- Tab 2: Filters (One-click Presets) -->
-      <div class="tab-content" id="tab-filters">
-        <div class="panel-section">
-          <div class="section-title">
-            <span><i class="fa-solid fa-sparkles"></i> Preset Filters</span>
-          </div>
-          
+      <!-- PANEL: Preset Filters -->
+      <div class="ps-panel" id="panel-filters">
+        <div class="ps-panel-header" data-panel="panel-filters">
+          <span class="ps-panel-arrow">&#9658;</span>
+          <span class="ps-panel-title"><i class="fa-solid fa-sparkles"></i> Preset Filters</span>
+        </div>
+        <div class="ps-panel-body">
           <div class="filter-grid">
             <button class="filter-preset-card active" data-preset="normal">
               <div class="preset-preview normal"></div>
@@ -295,73 +285,69 @@
             </button>
             <button class="filter-preset-card" data-preset="vintage">
               <div class="preset-preview vintage"></div>
-              <span>Vintage Sepia</span>
+              <span>Vintage</span>
             </button>
             <button class="filter-preset-card" data-preset="cyberpunk">
               <div class="preset-preview cyberpunk"></div>
-              <span>Cyberpunk Neon</span>
+              <span>Cyberpunk</span>
             </button>
             <button class="filter-preset-card" data-preset="dramatic">
               <div class="preset-preview dramatic"></div>
-              <span>Dramatic B&W</span>
+              <span>Dramatic</span>
             </button>
             <button class="filter-preset-card" data-preset="warm">
               <div class="preset-preview warm"></div>
-              <span>Warm Sunset</span>
+              <span>Warm</span>
             </button>
             <button class="filter-preset-card" data-preset="cool">
               <div class="preset-preview cool"></div>
-              <span>Cool Cyber</span>
+              <span>Cool</span>
             </button>
             <button class="filter-preset-card" data-preset="invert">
               <div class="preset-preview invert"></div>
-              <span>Invert Negative</span>
+              <span>Invert</span>
             </button>
             <button class="filter-preset-card" data-preset="popart">
               <div class="preset-preview popart"></div>
-              <span>Vivid Vivid</span>
+              <span>Vivid</span>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Tab 3: Transform & Canvas Size -->
-      <div class="tab-content" id="tab-transform">
-        <div class="panel-section">
-          <div class="section-title">
-            <span><i class="fa-solid fa-arrows-rotate"></i> การหมุนและพลิกภาพ</span>
-          </div>
+      <!-- PANEL: Transform -->
+      <div class="ps-panel" id="panel-transform">
+        <div class="ps-panel-header" data-panel="panel-transform">
+          <span class="ps-panel-arrow">&#9658;</span>
+          <span class="ps-panel-title"><i class="fa-solid fa-arrows-rotate"></i> Transform</span>
+        </div>
+        <div class="ps-panel-body">
           <div class="grid-2col">
-            <button class="btn btn-dark" id="btn-rotate-left">
-              <i class="fa-solid fa-rotate-left"></i> หมุนซ้าย 90°
-            </button>
-            <button class="btn btn-dark" id="btn-rotate-right">
-              <i class="fa-solid fa-rotate-right"></i> หมุนขวา 90°
-            </button>
-            <button class="btn btn-dark" id="btn-flip-h">
-              <i class="fa-solid fa-arrows-left-right"></i> พลิกแนวนอน
-            </button>
-            <button class="btn btn-dark" id="btn-flip-v">
-              <i class="fa-solid fa-arrows-up-down"></i> พลิกแนวตั้ง
-            </button>
+            <button class="btn btn-dark" id="btn-rotate-left"><i class="fa-solid fa-rotate-left"></i> หมุนซ้าย</button>
+            <button class="btn btn-dark" id="btn-rotate-right"><i class="fa-solid fa-rotate-right"></i> หมุนขวา</button>
+            <button class="btn btn-dark" id="btn-flip-h"><i class="fa-solid fa-arrows-left-right"></i> พลิกนอน</button>
+            <button class="btn btn-dark" id="btn-flip-v"><i class="fa-solid fa-arrows-up-down"></i> พลิกตั้ง</button>
           </div>
         </div>
+      </div>
 
-        <div class="panel-section">
-          <div class="section-title">
-            <span><i class="fa-solid fa-expand"></i> ปรับขนาด Canvas / Image</span>
-          </div>
-          
+      <!-- PANEL: Canvas Size -->
+      <div class="ps-panel" id="panel-resize">
+        <div class="ps-panel-header" data-panel="panel-resize">
+          <span class="ps-panel-arrow">&#9658;</span>
+          <span class="ps-panel-title"><i class="fa-solid fa-expand"></i> Canvas Size</span>
+        </div>
+        <div class="ps-panel-body">
           <div class="input-form-group">
             <div class="input-pair">
-              <label>ความกว้าง (Width)</label>
+              <label>Width</label>
               <div class="input-unit">
                 <input type="number" id="input-width" value="800" min="10">
                 <span>px</span>
               </div>
             </div>
             <div class="input-pair">
-              <label>ความสูง (Height)</label>
+              <label>Height</label>
               <div class="input-unit">
                 <input type="number" id="input-height" value="600" min="10">
                 <span>px</span>
@@ -370,25 +356,24 @@
           </div>
           <div class="checkbox-row">
             <input type="checkbox" id="check-aspect" checked>
-            <label for="check-aspect">รักษาสัดส่วน (Keep Aspect Ratio)</label>
+            <label for="check-aspect">Keep Aspect Ratio</label>
           </div>
           <button class="btn btn-primary w-full mt-2" id="btn-apply-resize">
-            <i class="fa-solid fa-check"></i> ตกลงปรับขนาด
+            <i class="fa-solid fa-check"></i> Apply Resize
           </button>
         </div>
       </div>
 
-      <!-- Sidebar Bottom Clipboard Quick Actions -->
-      <div class="sidebar-bottom-actions">
-        <div class="quick-action-box">
-          <div class="quick-action-title">
-            <i class="fa-solid fa-bolt text-warning"></i> สรุปการคัดลอกลง Clipboard
-          </div>
-          <p class="text-xs text-subtle">
-            กดปุ่มด้านล่าง รูปใน Canvas จะถูกแปลงเป็น PNG และส่งตรงไปที่ Clipboard พร้อมใช้งานทันที
-          </p>
+      <!-- PANEL: Clipboard -->
+      <div class="ps-panel" id="panel-clipboard">
+        <div class="ps-panel-header" data-panel="panel-clipboard">
+          <span class="ps-panel-arrow">&#9658;</span>
+          <span class="ps-panel-title"><i class="fa-solid fa-copy"></i> Clipboard</span>
+        </div>
+        <div class="ps-panel-body">
+          <p class="text-xs text-subtle">รูปใน Canvas จะถูกแปลงเป็น PNG ส่งไปที่ Clipboard ทันที</p>
           <button id="btn-copy-sidebar" class="btn btn-primary glow-btn w-full mt-1">
-            <i class="fa-solid fa-copy"></i> ก็อปปี้รูปส่ง Clipboard (Ctrl+C)
+            <i class="fa-solid fa-copy"></i> Copy to Clipboard (Ctrl+C)
           </button>
         </div>
       </div>
