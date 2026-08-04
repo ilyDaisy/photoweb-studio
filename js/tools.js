@@ -286,6 +286,13 @@ export class ToolsManager {
 
     const handleStart = (e) => {
       if (!this.engine.hasImage) return;
+
+      // If 2 or more touches (Pinch Gesture on iPad), cancel drawing
+      if (e.touches && e.touches.length >= 2) {
+        this.isDrawing = false;
+        return;
+      }
+
       if (e.type.startsWith('mouse') && e.button !== 0) return;
 
       if (e.cancelable && (e.type.startsWith('touch') || e.type.startsWith('pointer'))) {
@@ -309,6 +316,12 @@ export class ToolsManager {
     };
 
     const handleMove = (e) => {
+      // If 2 or more touches, cancel single finger drawing
+      if (e.touches && e.touches.length >= 2) {
+        this.isDrawing = false;
+        return;
+      }
+
       const coords = this.engine.getCanvasCoords(e);
 
       // Cursor Coords status text update
@@ -330,6 +343,7 @@ export class ToolsManager {
       this.lastX = coords.x;
       this.lastY = coords.y;
     };
+
 
     const handleEnd = (e) => {
       if (!this.isDrawing) return;

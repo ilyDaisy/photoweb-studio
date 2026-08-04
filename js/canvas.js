@@ -53,7 +53,7 @@ export class CanvasEngine {
    * Initialize Zoom & Pan interactions
    */
   initViewportEvents() {
-    // Zoom via Mouse Wheel (Photoshop style zoom towards mouse cursor)
+    // 1. Zoom via Mouse Wheel (Photoshop style zoom towards mouse cursor)
     this.viewport.addEventListener('wheel', (e) => {
       e.preventDefault();
       const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
@@ -65,10 +65,57 @@ export class CanvasEngine {
       this.setZoom(this.zoom * zoomFactor, mouseX, mouseY);
     }, { passive: false });
 
+    // 2. iPad 2-Finger Pinch Zoom & Pan Gestures
+    let touchStartDist = 0;
+    let touchStartZoom = 1.0;
+    let touchStartPanX = 0;
+    let touchStartPanY = 0;
+    let touchStartMidX = 0;
+    let touchStartMidY = 0;
 
-    // Middle Mouse or Spacebar Pan
+    this.viewport.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+
+        touchStartDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+        touchStartZoom = this.zoom;
+        touchStartPanX = this.panX;
+        touchStartPanY = this.panY;
+        touchStartMidX = (t1.clientX + t2.clientX) / 2;
+        touchStartMidY = (t1.clientY + t2.clientY) / 2;
+      }
+    }, { passive: false });
+
+    this.viewport.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+
+        const currentDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+        const currentMidX = (t1.clientX + t2.clientX) / 2;
+        const currentMidY = (t1.clientY + t2.clientY) / 2;
+
+        if (touchStartDist > 0) {
+          const scaleRatio = currentDist / touchStartDist;
+          const newZoom = touchStartZoom * scaleRatio;
+
+          const rect = this.viewport.getBoundingClientRect();
+          const midX = currentMidX - rect.left - rect.width / 2;
+          const midY = currentMidY - rect.top - rect.height / 2;
+
+          this.panX = touchStartPanX + (currentMidX - touchStartMidX);
+          this.panY = touchStartPanY + (currentMidY - touchStartMidY);
+          this.setZoom(newZoom, midX, midY);
+        }
+      }
+    }, { passive: false });
+
+    // 3. Middle Mouse or Hand Tool Pan
     this.viewport.addEventListener('mousedown', (e) => {
-      if (e.button === 1 || this.activeTool === 'pan') { // Middle click or Hand tool
+      if (e.button === 1 || this.activeTool === 'pan') {
         this.isPanning = true;
         this.panStartX = e.clientX - this.panX;
         this.panStartY = e.clientY - this.panY;
@@ -91,6 +138,7 @@ export class CanvasEngine {
       }
     });
   }
+
 
   /**
    * Set Canvas Dimensions and reset view
@@ -249,18 +297,30 @@ export class CanvasEngine {
   }
 
   /**
-   * Convert Client Mouse Event Coordinates to Canvas Relative Pixel Coordinates
+   * Convert Client Mouse / Touch Event Coordinates to Canvas Relative Pixel Coordinates
    */
   getCanvasCoords(e) {
     const rect = this.mainCanvas.getBoundingClientRect();
-    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+    let clientX = e.clientX;
+    let clientY = e.clientY;
+
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else if (e.changedTouches && e.changedTouches.length > 0) {
+      clientX = e.changedTouches[0].clientX;
+      clientY = e.changedTouches[0].clientY;
+    }
+
+    if (clientX === undefined) clientX = 0;
+    if (clientY === undefined) clientY = 0;
 
     const x = Math.round((clientX - rect.left) * (this.width / rect.width));
     const y = Math.round((clientY - rect.top) * (this.height / rect.height));
 
     return { x, y };
   }
+
 
   /**
    * History Stack Management (Undo/Redo)
