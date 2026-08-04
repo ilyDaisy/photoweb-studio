@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhotoWeb Studio - Clipboard Native Image Editor</title>
+  <meta name="description" content="แก้ไขรูปภาพสไตล์ Photoshop ก็อปปี้และเซฟรูปผ่าน Clipboard โดยไม่ต้องดาวน์โหลดลงเครื่อง">
+  <!-- Google Fonts: Inter & Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+
+  <!-- Top Header Navigation -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-logo">
+        <i class="fa-solid fa-layer-group"></i>
+      </div>
+      <div class="brand-info">
+        <span class="app-title">PhotoWeb Studio</span>
+        <span class="app-badge"><i class="fa-regular fa-clipboard"></i> Clipboard Native</span>
+      </div>
+    </div>
+
+    <div class="header-center-actions">
+      <button id="btn-undo" class="btn btn-icon" title="Undo (Ctrl+Z)" disabled>
+        <i class="fa-solid fa-rotate-left"></i>
+      </button>
+      <button id="btn-redo" class="btn btn-icon" title="Redo (Ctrl+Y)" disabled>
+        <i class="fa-solid fa-rotate-right"></i>
+      </button>
+      <div class="divider-v"></div>
+      <button id="btn-zoom-out" class="btn btn-icon" title="Zoom Out (Ctrl -)">
+        <i class="fa-solid fa-magnifying-glass-minus"></i>
+      </button>
+      <span id="zoom-level-text" class="zoom-display">100%</span>
+      <button id="btn-zoom-in" class="btn btn-icon" title="Zoom In (Ctrl +)">
+        <i class="fa-solid fa-magnifying-glass-plus"></i>
+      </button>
+      <button id="btn-zoom-fit" class="btn btn-sm btn-subtle" title="Fit to Screen (Ctrl 0)">Fit</button>
+
+    </div>
+
+    <div class="header-right-actions">
+      <button id="btn-paste-header" class="btn btn-secondary" title="Paste Image from Clipboard (Ctrl+V)">
+        <i class="fa-regular fa-paste"></i> วางรูปภาพ
+      </button>
+      <button id="btn-copy-header" class="btn btn-primary glow-btn" title="Copy to Clipboard (Ctrl+C)">
+        <i class="fa-solid fa-copy"></i> ก็อปปี้ลง Clipboard
+      </button>
+      <button id="btn-export-file" class="btn btn-dark" title="Download File">
+        <i class="fa-solid fa-download"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Secondary Tool Options Bar -->
+  <div class="tool-options-bar" id="tool-options-bar">
+    <div class="tool-name-indicator">
+      <i class="fa-solid fa-hand-pointer" id="current-tool-icon"></i>
+      <span id="current-tool-name">Select / Move</span>
+    </div>
+    <div class="divider-v"></div>
+    <div class="tool-controls-container" id="tool-controls-container">
+      <!-- Contextual controls will be dynamically injected here -->
+      <span class="text-subtle text-sm">เลือกเครื่องมือจากฝั่งซ้ายเพื่อปรับการตั้งค่า</span>
+    </div>
+  </div>
+
+  <!-- Main Studio Workspace Layout -->
+  <main class="studio-layout">
+    
+    <!-- Left Toolbar -->
+    <aside class="left-toolbar">
+      <div class="tool-group">
+        <button class="tool-btn active" data-tool="select" title="Move / Select (V)">
+          <i class="fa-solid fa-arrow-pointer"></i>
+        </button>
+        <button class="tool-btn" data-tool="crop" title="Crop Canvas (C)">
+          <i class="fa-solid fa-crop-simple"></i>
+        </button>
+      </div>
+
+      <div class="tool-group">
+        <button class="tool-btn" data-tool="brush" title="Brush Tool (B)">
+          <i class="fa-solid fa-paint-brush"></i>
+        </button>
+        <button class="tool-btn" data-tool="eraser" title="Eraser Tool (E)">
+          <i class="fa-solid fa-eraser"></i>
+        </button>
+      </div>
+
+      <div class="tool-group">
+        <button class="tool-btn" data-tool="shape-rect" title="Rectangle Tool (R)">
+          <i class="fa-regular fa-square"></i>
+        </button>
+        <button class="tool-btn" data-tool="shape-circle" title="Circle Tool (O)">
+          <i class="fa-regular fa-circle"></i>
+        </button>
+        <button class="tool-btn" data-tool="shape-arrow" title="Arrow Annotation (A)">
+          <i class="fa-solid fa-arrow-right font-size-sm"></i>
+        </button>
+        <button class="tool-btn" data-tool="shape-line" title="Line Tool (L)">
+          <i class="fa-solid fa-slash"></i>
+        </button>
+      </div>
+
+      <div class="tool-group">
+        <button class="tool-btn" data-tool="text" title="Add Text (T)">
+          <i class="fa-solid fa-font"></i>
+        </button>
+      </div>
+
+      <div class="tool-group">
+        <button class="tool-btn" data-tool="pan" title="Pan Hand Tool (H)">
+          <i class="fa-solid fa-hand"></i>
+        </button>
+      </div>
+
+      <div class="color-picker-box">
+        <div class="color-swatch-wrapper" title="Foreground Color">
+          <input type="color" id="primary-color" value="#00e5ff">
+        </div>
+        <div class="color-swatch-wrapper secondary" title="Stroke / Secondary Color">
+          <input type="color" id="secondary-color" value="#ffffff">
+        </div>
+        <button id="btn-swap-color" class="btn-swap-color" title="Swap Colors">
+          <i class="fa-solid fa-arrow-rotate-right"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Canvas Workspace Center Area -->
+    <section class="canvas-workspace" id="canvas-workspace">
+      
+      <!-- Canvas Container with Zoom/Pan Matrix -->
+      <div class="canvas-viewport" id="canvas-viewport">
+        
+        <!-- Welcome / Empty State Dropzone -->
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon-glow">
+            <i class="fa-regular fa-clipboard"></i>
+          </div>
+          <h2>พร้อมแต่งรูปภาพทันที</h2>
+          <p class="empty-subtitle">ก็อปปี้รูปจากที่ไหนก็ได้ แล้วกดวางภาพได้เลย!</p>
+
+          <div class="quick-paste-cards">
+            <div class="card-shortcut" id="btn-trigger-paste">
+              <div class="key-badge">Ctrl</div>
+              <span class="plus">+</span>
+              <div class="key-badge">V</div>
+              <span class="card-label">วางภาพจาก Clipboard</span>
+            </div>
+            <div class="or-text">หรือ</div>
+            <label class="card-upload">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span>เลือกไฟล์จากคอม</span>
+              <input type="file" id="file-input" accept="image/*" class="hidden-input">
+            </label>
+          </div>
+
+          <div class="demo-samples">
+            <span>หรือทดลองกับรูปตัวอย่าง:</span>
+            <div class="sample-chips">
+              <button class="chip" data-sample="banner">🎨 Canvas Banner</button>
+              <button class="chip" data-sample="portrait">📸 Portrait Model</button>
+              <button class="chip" data-sample="scenery">🏔️ Landscape View</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- The Main Working HTML5 Canvas -->
+        <div class="canvas-wrapper hidden" id="canvas-wrapper">
+          <canvas id="main-canvas"></canvas>
+          <canvas id="overlay-canvas"></canvas> <!-- For active drawing / selection guides -->
+        </div>
+
+      </div>
+
+      <!-- Quick Canvas Floating Info Footer -->
+      <div class="canvas-status-bar" id="canvas-status-bar">
+        <div class="status-item"><i class="fa-solid fa-ruler-combined"></i> <span id="canvas-dimensions">0 x 0 px</span></div>
+        <div class="status-item"><i class="fa-solid fa-crosshairs"></i> <span id="cursor-coords">X: 0, Y: 0</span></div>
+        <div class="status-item highlight"><i class="fa-regular fa-lightbulb"></i> <span id="hint-text">เคล็ดลับ: กด Ctrl+V เมื่อไหร่ก็ได้เพื่อวางรูปภาพใหม่</span></div>
+      </div>
+    </section>
+
+    <!-- Right Control Panels -->
+    <aside class="right-sidebar">
+      
+      <!-- Panel Tabs Header -->
+      <div class="sidebar-tabs">
+        <button class="tab-btn active" data-tab="adjustments">
+          <i class="fa-solid fa-sliders"></i> ปรับแต่ง
+        </button>
+        <button class="tab-btn" data-tab="filters">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> ฟิลเตอร์
+        </button>
+        <button class="tab-btn" data-tab="transform">
+          <i class="fa-solid fa-vector-square"></i> มิติภาพ
+        </button>
+      </div>
+
+      <!-- Tab 1: Adjustments (Sliders) -->
+      <div class="tab-content active" id="tab-adjustments">
+        <div class="panel-section">
+          <div class="section-title">
+            <span><i class="fa-solid fa-sun"></i> ความสว่าง & คอนทราสต์</span>
+            <button class="btn-text-reset" id="btn-reset-adj">รีเซ็ต</button>
+          </div>
+
+          <div class="control-slider-group">
+            <div class="slider-header">
+              <label for="slider-brightness">Brightness (ความสว่าง)</label>
+              <span id="val-brightness">0</span>
+            </div>
+            <input type="range" id="slider-brightness" min="-100" max="100" value="0">
+          </div>
+
+          <div class="control-slider-group">
+            <div class="slider-header">
+              <label for="slider-contrast">Contrast (ความคมชัด)</label>
+              <span id="val-contrast">0</span>
+            </div>
+            <input type="range" id="slider-contrast" min="-100" max="100" value="0">
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="section-title">
+            <span><i class="fa-solid fa-palette"></i> สี & โทนภาพ (Color Tone)</span>
+          </div>
+
+          <div class="control-slider-group">
+            <div class="slider-header">
+              <label for="slider-saturation">Saturation (ความสดสี)</label>
+              <span id="val-saturation">0</span>
+            </div>
+            <input type="range" id="slider-saturation" min="-100" max="100" value="0">
+          </div>
+
+          <div class="control-slider-group">
+            <div class="slider-header">
+              <label for="slider-hue">Hue Shift (ปรับเฉดสี)</label>
+              <span id="val-hue">0°</span>
+            </div>
+            <input type="range" id="slider-hue" min="-180" max="180" value="0">
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="section-title">
+            <span><i class="fa-solid fa-eye-dropper"></i> เอฟเฟกต์พิเศษ</span>
+          </div>
+
+          <div class="control-slider-group">
+            <div class="slider-header">
+              <label for="slider-blur">Blur (ความเบลอ)</label>
+              <span id="val-blur">0px</span>
+            </div>
+            <input type="range" id="slider-blur" min="0" max="20" value="0" step="0.5">
+          </div>
+
+          <div class="control-slider-group">
+            <div class="slider-header">
+              <label for="slider-sharpen">Sharpen (ความคม)</label>
+              <span id="val-sharpen">0</span>
+            </div>
+            <input type="range" id="slider-sharpen" min="0" max="100" value="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Filters (One-click Presets) -->
+      <div class="tab-content" id="tab-filters">
+        <div class="panel-section">
+          <div class="section-title">
+            <span><i class="fa-solid fa-sparkles"></i> Preset Filters</span>
+          </div>
+          
+          <div class="filter-grid">
+            <button class="filter-preset-card active" data-preset="normal">
+              <div class="preset-preview normal"></div>
+              <span>Normal</span>
+            </button>
+            <button class="filter-preset-card" data-preset="vintage">
+              <div class="preset-preview vintage"></div>
+              <span>Vintage Sepia</span>
+            </button>
+            <button class="filter-preset-card" data-preset="cyberpunk">
+              <div class="preset-preview cyberpunk"></div>
+              <span>Cyberpunk Neon</span>
+            </button>
+            <button class="filter-preset-card" data-preset="dramatic">
+              <div class="preset-preview dramatic"></div>
+              <span>Dramatic B&W</span>
+            </button>
+            <button class="filter-preset-card" data-preset="warm">
+              <div class="preset-preview warm"></div>
+              <span>Warm Sunset</span>
+            </button>
+            <button class="filter-preset-card" data-preset="cool">
+              <div class="preset-preview cool"></div>
+              <span>Cool Cyber</span>
+            </button>
+            <button class="filter-preset-card" data-preset="invert">
+              <div class="preset-preview invert"></div>
+              <span>Invert Negative</span>
+            </button>
+            <button class="filter-preset-card" data-preset="popart">
+              <div class="preset-preview popart"></div>
+              <span>Vivid Vivid</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Transform & Canvas Size -->
+      <div class="tab-content" id="tab-transform">
+        <div class="panel-section">
+          <div class="section-title">
+            <span><i class="fa-solid fa-arrows-rotate"></i> การหมุนและพลิกภาพ</span>
+          </div>
+          <div class="grid-2col">
+            <button class="btn btn-dark" id="btn-rotate-left">
+              <i class="fa-solid fa-rotate-left"></i> หมุนซ้าย 90°
+            </button>
+            <button class="btn btn-dark" id="btn-rotate-right">
+              <i class="fa-solid fa-rotate-right"></i> หมุนขวา 90°
+            </button>
+            <button class="btn btn-dark" id="btn-flip-h">
+              <i class="fa-solid fa-arrows-left-right"></i> พลิกแนวนอน
+            </button>
+            <button class="btn btn-dark" id="btn-flip-v">
+              <i class="fa-solid fa-arrows-up-down"></i> พลิกแนวตั้ง
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="section-title">
+            <span><i class="fa-solid fa-expand"></i> ปรับขนาด Canvas / Image</span>
+          </div>
+          
+          <div class="input-form-group">
+            <div class="input-pair">
+              <label>ความกว้าง (Width)</label>
+              <div class="input-unit">
+                <input type="number" id="input-width" value="800" min="10">
+                <span>px</span>
+              </div>
+            </div>
+            <div class="input-pair">
+              <label>ความสูง (Height)</label>
+              <div class="input-unit">
+                <input type="number" id="input-height" value="600" min="10">
+                <span>px</span>
+              </div>
+            </div>
+          </div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="check-aspect" checked>
+            <label for="check-aspect">รักษาสัดส่วน (Keep Aspect Ratio)</label>
+          </div>
+          <button class="btn btn-primary w-full mt-2" id="btn-apply-resize">
+            <i class="fa-solid fa-check"></i> ตกลงปรับขนาด
+          </button>
+        </div>
+      </div>
+
+      <!-- Sidebar Bottom Clipboard Quick Actions -->
+      <div class="sidebar-bottom-actions">
+        <div class="quick-action-box">
+          <div class="quick-action-title">
+            <i class="fa-solid fa-bolt text-warning"></i> สรุปการคัดลอกลง Clipboard
+          </div>
+          <p class="text-xs text-subtle">
+            กดปุ่มด้านล่าง รูปใน Canvas จะถูกแปลงเป็น PNG และส่งตรงไปที่ Clipboard พร้อมใช้งานทันที
+          </p>
+          <button id="btn-copy-sidebar" class="btn btn-primary glow-btn w-full mt-1">
+            <i class="fa-solid fa-copy"></i> ก็อปปี้รูปส่ง Clipboard (Ctrl+C)
+          </button>
+        </div>
+      </div>
+
+    </aside>
+
+  </main>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Modal Export File Options (Optional secondary download) -->
+  <div class="modal-backdrop hidden" id="export-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-download"></i> ดาวน์โหลดรูปภาพลงเครื่อง</h3>
+        <button class="btn-close" id="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="export-filename">ชื่อไฟล์</label>
+          <input type="text" id="export-filename" value="photoweb-edited">
+        </div>
+        <div class="form-group">
+          <label for="export-format">ฟอร์แมตไฟล์</label>
+          <select id="export-format">
+            <option value="image/png">PNG (.png) - พื้นหลังใส/คมชัดสูง</option>
+            <option value="image/jpeg">JPEG (.jpg) - ขนาดไฟล์เล็ก</option>
+            <option value="image/webp">WebP (.webp) - เบราว์เซอร์ยุคใหม่</option>
+          </select>
+        </div>
+        <div class="form-group" id="quality-group" style="display:none;">
+          <label for="export-quality">คุณภาพ (Quality): <span id="val-quality">90%</span></label>
+          <input type="range" id="export-quality" min="10" max="100" value="90">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-dark" id="btn-cancel-modal">ยกเลิก</button>
+        <button class="btn btn-primary" id="btn-confirm-export">ดาวน์โหลดไฟล์</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Scripts -->
+  <script src="js/clipboard.js" type="module"></script>
+  <script src="js/filters.js" type="module"></script>
+  <script src="js/canvas.js" type="module"></script>
+  <script src="js/tools.js" type="module"></script>
+  <script src="js/app.js" type="module"></script>
+</body>
+</html>
