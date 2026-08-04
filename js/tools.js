@@ -279,14 +279,19 @@ export class ToolsManager {
   }
 
   /**
-   * Main Canvas Mouse Interaction Wiring
+   * Main Canvas Interaction Wiring (Mouse, Touch Screen iPad, Apple Pencil)
    */
   initToolEvents() {
     const canvas = this.engine.mainCanvas;
 
-    canvas.addEventListener('mousedown', (e) => {
-      if (!this.engine.hasImage || e.button !== 0) return;
-      
+    const handleStart = (e) => {
+      if (!this.engine.hasImage) return;
+      if (e.type.startsWith('mouse') && e.button !== 0) return;
+
+      if (e.cancelable && (e.type.startsWith('touch') || e.type.startsWith('pointer'))) {
+        e.preventDefault();
+      }
+
       const coords = this.engine.getCanvasCoords(e);
       this.isDrawing = true;
       this.startX = coords.x;
@@ -301,9 +306,9 @@ export class ToolsManager {
       if (this.activeTool === 'text') {
         this.handleTextClick(coords.x, coords.y);
       }
-    });
+    };
 
-    window.addEventListener('mousemove', (e) => {
+    const handleMove = (e) => {
       const coords = this.engine.getCanvasCoords(e);
 
       // Cursor Coords status text update
@@ -311,6 +316,10 @@ export class ToolsManager {
       if (coordsText) coordsText.textContent = `X: ${coords.x}, Y: ${coords.y}`;
 
       if (!this.isDrawing) return;
+
+      if (e.cancelable && (e.type.startsWith('touch') || e.type.startsWith('pointer'))) {
+        e.preventDefault();
+      }
 
       if (this.activeTool === 'brush' || this.activeTool === 'eraser') {
         this.drawStroke(coords.x, coords.y, false);
@@ -320,9 +329,9 @@ export class ToolsManager {
 
       this.lastX = coords.x;
       this.lastY = coords.y;
-    });
+    };
 
-    window.addEventListener('mouseup', (e) => {
+    const handleEnd = (e) => {
       if (!this.isDrawing) return;
       this.isDrawing = false;
 
@@ -349,8 +358,26 @@ export class ToolsManager {
           if (applyBtn) applyBtn.disabled = false;
         }
       }
-    });
+    };
+
+    // Pointer Events (iPad Touch & Apple Pencil)
+    canvas.addEventListener('pointerdown', handleStart, { passive: false });
+    window.addEventListener('pointermove', handleMove, { passive: false });
+    window.addEventListener('pointerup', handleEnd);
+    window.addEventListener('pointercancel', handleEnd);
+
+    // Touch Events Fallback for Mobile Safari
+    canvas.addEventListener('touchstart', handleStart, { passive: false });
+    window.addEventListener('touchmove', handleMove, { passive: false });
+    window.addEventListener('touchend', handleEnd);
+    window.addEventListener('touchcancel', handleEnd);
+
+    // Mouse Fallbacks
+    canvas.addEventListener('mousedown', handleStart);
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('mouseup', handleEnd);
   }
+
 
   /**
    * Main Stroke Dispatcher

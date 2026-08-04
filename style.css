@@ -564,6 +564,7 @@ body.dark-theme {
 #main-canvas {
   display: block;
   image-rendering: pixelated;
+  touch-action: none;
 }
 
 #overlay-canvas {
@@ -571,7 +572,9 @@ body.dark-theme {
   top: 0;
   left: 0;
   pointer-events: none;
+  touch-action: none;
 }
+
 
 /* Canvas Status Footer */
 .canvas-status-bar {
