@@ -53,14 +53,18 @@ export class CanvasEngine {
    * Initialize Zoom & Pan interactions
    */
   initViewportEvents() {
-    // Zoom via Mouse Wheel
+    // Zoom via Mouse Wheel (Photoshop style zoom towards mouse cursor)
     this.viewport.addEventListener('wheel', (e) => {
-      if (e.ctrlKey || e.metaKey || true) { // Smooth zoom
-        e.preventDefault();
-        const delta = e.deltaY < 0 ? 1.1 : 0.9;
-        this.setZoom(this.zoom * delta, e.clientX, e.clientY);
-      }
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
+
+      const rect = this.viewport.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left - rect.width / 2;
+      const mouseY = e.clientY - rect.top - rect.height / 2;
+
+      this.setZoom(this.zoom * zoomFactor, mouseX, mouseY);
     }, { passive: false });
+
 
     // Middle Mouse or Spacebar Pan
     this.viewport.addEventListener('mousedown', (e) => {
@@ -195,6 +199,14 @@ export class CanvasEngine {
    */
   setZoom(newZoom, mouseX, mouseY) {
     const clampedZoom = Math.min(Math.max(0.1, newZoom), 10.0);
+    if (clampedZoom === this.zoom) return;
+
+    if (mouseX !== undefined && mouseY !== undefined) {
+      const zoomRatio = clampedZoom / this.zoom;
+      this.panX = this.panX * zoomRatio + mouseX * (1 - zoomRatio);
+      this.panY = this.panY * zoomRatio + mouseY * (1 - zoomRatio);
+    }
+
     this.zoom = clampedZoom;
     
     const zoomText = document.getElementById('zoom-level-text');
@@ -202,6 +214,7 @@ export class CanvasEngine {
 
     this.updateTransform();
   }
+
 
   zoomToFit() {
     if (!this.hasImage) return;
