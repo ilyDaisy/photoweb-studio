@@ -217,26 +217,15 @@ document.addEventListener('DOMContentLoaded', () => {
      ========================================================================== */
 
   const rightSidebar = document.getElementById('right-sidebar');
-  const sidebarSlideBtn = document.getElementById('btn-sidebar-slide');
+  const toggleSidebarBtn = document.getElementById('btn-toggle-sidebar'); // sliders icon in header
 
-  // Toggle sidebar open/close — button is on the right edge of the canvas
-  if (sidebarSlideBtn && rightSidebar) {
-    sidebarSlideBtn.addEventListener('click', () => {
-      const isClosing = !rightSidebar.classList.contains('slide-closed');
-      rightSidebar.classList.toggle('slide-closed');
-      document.body.classList.toggle('sidebar-closed', isClosing);
-      // Re-fit canvas after animation ends
-      setTimeout(() => canvasEngine.zoomToFit(), 300);
-    });
-  }
-
-  // Legacy header toggle button (if any)
-  const toggleSidebarBtn = document.getElementById('btn-toggle-sidebar');
+  // Header sliders button toggles the entire right sidebar open/closed
   if (toggleSidebarBtn && rightSidebar) {
     toggleSidebarBtn.addEventListener('click', () => {
-      const isClosing = !rightSidebar.classList.contains('slide-closed');
+      const closing = !rightSidebar.classList.contains('slide-closed');
       rightSidebar.classList.toggle('slide-closed');
-      document.body.classList.toggle('sidebar-closed', isClosing);
+      document.body.classList.toggle('sidebar-closed', closing);
+      // Re-fit canvas after transition
       setTimeout(() => canvasEngine.zoomToFit(), 300);
     });
   }
