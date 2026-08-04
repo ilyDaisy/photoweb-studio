@@ -193,15 +193,16 @@
         <div class="status-item"><i class="fa-solid fa-crosshairs"></i> <span id="cursor-coords">X: 0, Y: 0</span></div>
         <div class="status-item highlight"><i class="fa-regular fa-lightbulb"></i> <span id="hint-text">เคล็ดลับ: กด Ctrl+V เมื่อไหร่ก็ได้เพื่อวางรูปภาพใหม่</span></div>
       </div>
+
+      <!-- Toggle button floating on the right edge of canvas -->
+      <button class="sidebar-toggle-btn" id="btn-sidebar-slide" title="เปิด/ปิดแถบพาเนล">
+        <i class="fa-solid fa-chevron-right" id="sidebar-slide-icon"></i>
+      </button>
+
     </section>
 
     <!-- Right Control Panels (Photoshop-style collapsible accordion) -->
     <aside class="right-sidebar ps-panels" id="right-sidebar">
-
-      <!-- Slide Toggle Tab (on the left edge) -->
-      <button class="sidebar-slide-tab" id="btn-sidebar-slide" title="เปิด/ปิดแถบพาเนล">
-        <i class="fa-solid fa-chevron-right" id="sidebar-slide-icon"></i>
-      </button>
 
       <!-- All panel content wrapped for hide/show -->
       <div class="ps-panels-content">

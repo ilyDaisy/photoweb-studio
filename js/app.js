@@ -219,35 +219,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const rightSidebar = document.getElementById('right-sidebar');
   const sidebarSlideBtn = document.getElementById('btn-sidebar-slide');
 
-  // Slide sidebar in/out when clicking the tab on its left edge
+  // Toggle sidebar open/close — button is on the right edge of the canvas
   if (sidebarSlideBtn && rightSidebar) {
     sidebarSlideBtn.addEventListener('click', () => {
+      const isClosing = !rightSidebar.classList.contains('slide-closed');
       rightSidebar.classList.toggle('slide-closed');
-      // Re-fit canvas after sidebar animation ends
-      setTimeout(() => canvasEngine.zoomToFit(), 280);
+      document.body.classList.toggle('sidebar-closed', isClosing);
+      // Re-fit canvas after animation ends
+      setTimeout(() => canvasEngine.zoomToFit(), 300);
     });
   }
 
-  // Legacy header toggle button (if present)
+  // Legacy header toggle button (if any)
   const toggleSidebarBtn = document.getElementById('btn-toggle-sidebar');
   if (toggleSidebarBtn && rightSidebar) {
     toggleSidebarBtn.addEventListener('click', () => {
+      const isClosing = !rightSidebar.classList.contains('slide-closed');
       rightSidebar.classList.toggle('slide-closed');
-      setTimeout(() => canvasEngine.zoomToFit(), 280);
+      document.body.classList.toggle('sidebar-closed', isClosing);
+      setTimeout(() => canvasEngine.zoomToFit(), 300);
     });
   }
 
-  // Accordion panel toggle — click header to open/close
+  // Accordion panel toggle — click header to open/close each panel
   document.querySelectorAll('.ps-panel-header').forEach(header => {
     header.addEventListener('click', (e) => {
-      // Don't collapse when clicking Reset button inside header
       if (e.target.closest('.btn-text-reset')) return;
       const panel = header.closest('.ps-panel');
       if (panel) panel.classList.toggle('open');
     });
   });
 
-  // Open first two panels by default (like Photoshop default state)
+  // Open first two panels by default (Brightness/Contrast + Hue/Saturation)
   const allPanels = document.querySelectorAll('.ps-panel');
   if (allPanels[0]) allPanels[0].classList.add('open');
   if (allPanels[1]) allPanels[1].classList.add('open');

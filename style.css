@@ -605,41 +605,42 @@ body.dark-theme {
 /* Right Sidebar Panels */
 .right-sidebar {
   width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
   background-color: var(--bg-panel);
   border-left: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
-  /* Slide transition */
-  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-              min-width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
+  /* Smooth slide-out to the right */
+  transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+              min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.2s ease;
 }
 
-/* Collapsed state — width collapses to just the tab button */
+/* Collapsed: slide to the right and take no space */
 .right-sidebar.slide-closed {
-  width: 18px !important;
-  min-width: 18px !important;
-  overflow: visible; /* let the tab button stick out */
+  width: 0 !important;
+  min-width: 0 !important;
+  border-left: none;
+  overflow: hidden;
 }
 
-/* Hide all panel content when collapsed */
-.right-sidebar.slide-closed .ps-panels-content {
-  opacity: 0;
-  pointer-events: none;
-  visibility: hidden;
+/* --- Float toggle button on the RIGHT edge of canvas-workspace --- */
+.canvas-workspace {
+  position: relative; /* needed for absolute-positioned children */
 }
 
-/* The sticky tab button on the left edge */
-.sidebar-slide-tab {
+.sidebar-toggle-btn {
   position: absolute;
-  left: -22px;
+  right: 0;
   top: 50%;
   transform: translateY(-50%);
-  width: 22px;
-  height: 56px;
-  background: #2c2c2c;
+  width: 18px;
+  height: 52px;
+  background: #2a2a2a;
   border: 1px solid #444;
   border-right: none;
   border-radius: 6px 0 0 6px;
@@ -647,26 +648,30 @@ body.dark-theme {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #aaa;
-  font-size: 0.65rem;
-  z-index: 10;
-  transition: background 0.15s ease, color 0.15s ease;
+  color: #999;
+  font-size: 0.6rem;
+  z-index: 20;
+  transition: background 0.15s, color 0.15s;
 }
 
-.sidebar-slide-tab:hover {
-  background: #3a3a3a;
+.sidebar-toggle-btn:hover {
+  background: #383838;
   color: var(--accent-cyan);
 }
 
-/* Flip the chevron when open */
-.right-sidebar:not(.slide-closed) .sidebar-slide-tab i {
-  transform: rotate(0deg);
-  transition: transform 0.25s ease;
+/* Arrow points LEFT (‹) when sidebar is open = click to close */
+.sidebar-toggle-btn i {
+  transition: transform 0.28s ease;
+  transform: rotate(0deg); /* › pointing right when sidebar open = close */
 }
-.right-sidebar.slide-closed .sidebar-slide-tab i {
+
+/* When sidebar is closed, arrow flips to point LEFT (‹ = open) */
+body.sidebar-closed .sidebar-toggle-btn i {
   transform: rotate(180deg);
-  transition: transform 0.25s ease;
 }
+
+/* Remove old sidebar-slide-tab style */
+.sidebar-slide-tab { display: none; }
 
 
 
