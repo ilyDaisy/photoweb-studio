@@ -612,16 +612,11 @@ body.dark-theme {
   flex-direction: column;
   overflow: hidden;
   flex-shrink: 0;
-  /* Smooth slide-out: animate width so canvas naturally expands */
-  transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-              min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Collapsed: collapse width to 0, canvas fills the gap */
+/* Completely remove from layout — zero space, zero gap */
 .right-sidebar.slide-closed {
-  width: 0 !important;
-  min-width: 0 !important;
-  border-left: none;
+  display: none !important;
 }
 
 /* Fade the panel content when collapsing */

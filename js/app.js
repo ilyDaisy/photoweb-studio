@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const rightSidebar = document.getElementById('right-sidebar');
   const toggleSidebarBtn = document.getElementById('btn-toggle-sidebar');
 
-  // Auto-refit canvas whenever viewport resizes (sidebar open/close, window resize, etc.)
+  // Auto-refit canvas whenever viewport resizes (window resize, etc.)
   if (canvasEngine.viewport) {
     const resizeObserver = new ResizeObserver(() => {
       canvasEngine.zoomToFit();
@@ -227,12 +227,14 @@ document.addEventListener('DOMContentLoaded', () => {
     resizeObserver.observe(canvasEngine.viewport);
   }
 
-  // Header sliders button toggles sidebar
+  // Header sliders button toggles sidebar — display:none removes it from layout entirely
   if (toggleSidebarBtn && rightSidebar) {
     toggleSidebarBtn.addEventListener('click', () => {
       const closing = !rightSidebar.classList.contains('slide-closed');
       rightSidebar.classList.toggle('slide-closed');
       document.body.classList.toggle('sidebar-closed', closing);
+      // Wait for DOM reflow then refit canvas to new full width
+      requestAnimationFrame(() => requestAnimationFrame(() => canvasEngine.zoomToFit()));
     });
   }
 
