@@ -217,19 +217,17 @@ document.addEventListener('DOMContentLoaded', () => {
      ========================================================================== */
 
   const rightSidebar = document.getElementById('right-sidebar');
-  const toggleSidebarBtn = document.getElementById('btn-toggle-sidebar'); // sliders icon in header
+  const toggleSidebarBtn = document.getElementById('btn-toggle-sidebar');
 
-  // Fire zoomToFit EXACTLY when the sidebar slide animation finishes
-  if (rightSidebar) {
-    rightSidebar.addEventListener('transitionend', (e) => {
-      // Only react to the width transition (not other props)
-      if (e.propertyName === 'width') {
-        canvasEngine.zoomToFit();
-      }
+  // Auto-refit canvas whenever viewport resizes (sidebar open/close, window resize, etc.)
+  if (canvasEngine.viewport) {
+    const resizeObserver = new ResizeObserver(() => {
+      canvasEngine.zoomToFit();
     });
+    resizeObserver.observe(canvasEngine.viewport);
   }
 
-  // Header sliders button toggles the entire right sidebar open/closed
+  // Header sliders button toggles sidebar
   if (toggleSidebarBtn && rightSidebar) {
     toggleSidebarBtn.addEventListener('click', () => {
       const closing = !rightSidebar.classList.contains('slide-closed');
